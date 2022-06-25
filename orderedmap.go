@@ -1,13 +1,13 @@
 package orderedmap
 
-// New creates a new OrderedMap.
+// New creates a new OrderedMap
 func New[T any]() OrderedMap[T] {
-	return &orderedMap[T]{
+	return &OM[T]{
 		data: make(map[any]T),
 	}
 }
 
-// OrderedMap is a map with ordered keys
+// OrderedMap is a map with ordered keys.
 type OrderedMap[T any] interface {
 	Len() int
 	Set(key any, val T)
@@ -17,30 +17,31 @@ type OrderedMap[T any] interface {
 	ReplaceKey(oldKey any, newKey any) bool
 	SetBefore(presentKey any, newKey any, val T) (int, bool)
 	SetAfter(presentKey any, newKey any, val T) (int, bool)
-	GetIterator() Iterator[T]
+	Iterator() Iterator[T]
 }
 
-type orderedMap[T any] struct {
+// OM is the OrderedMap implementation.
+type OM[T any] struct {
 	key  []any
 	data map[any]T
 }
 
 // Len returns the number of elements in the map.
-func (m *orderedMap[T]) Len() int {
+func (m *OM[T]) Len() int {
 	return len(m.key)
 }
 
 // Set sets the value for the given key.
-func (m *orderedMap[T]) Set(key any, val T) {
+func (m *OM[T]) Set(key any, val T) {
 	if _, ok := m.data[key]; !ok {
 		m.key = append(m.key, key)
 	}
 	m.data[key] = val
 }
 
-// Get returns the value for the given key
+// Get returns the value for the given key.
 // If the key does not exist, the second argument will be false.
-func (m *orderedMap[T]) Get(key any) (T, bool) {
+func (m *OM[T]) Get(key any) (T, bool) {
 	if v, ok := m.data[key]; ok {
 		return v, true
 	}
@@ -49,7 +50,7 @@ func (m *orderedMap[T]) Get(key any) (T, bool) {
 
 // Delete deletes the value for the given key.
 // Returns deleted value, true if the key is found.
-func (m *orderedMap[T]) Delete(key any) (T, bool) {
+func (m *OM[T]) Delete(key any) (T, bool) {
 	if v, ok := m.data[key]; ok {
 		delete(m.data, key)
 		return v, true
@@ -59,7 +60,7 @@ func (m *orderedMap[T]) Delete(key any) (T, bool) {
 
 // Index returns the index of the given key.
 // If the key does not exist, returns -1.
-func (m *orderedMap[T]) Index(key any) int {
+func (m *OM[T]) Index(key any) int {
 	for i, k := range m.key {
 		if k == key {
 			return i
@@ -70,7 +71,7 @@ func (m *orderedMap[T]) Index(key any) int {
 
 // ReplaceKey replaces the key of the given key with the new key.
 // Returns false if the key does not exist.
-func (m *orderedMap[T]) ReplaceKey(oldKey any, newKey any) bool {
+func (m *OM[T]) ReplaceKey(oldKey any, newKey any) bool {
 	if _, ok := m.data[oldKey]; !ok {
 		return false
 	}
@@ -86,26 +87,26 @@ func (m *orderedMap[T]) ReplaceKey(oldKey any, newKey any) bool {
 
 // SetBefore sets the new (newKey, value) pair before the given presentKey.
 // Return false if presentKey does not exist or if newKey already exists.
-func (m *orderedMap[T]) SetBefore(presentKey any, newKey any, value T) (int, bool) {
+func (m *OM[T]) SetBefore(presentKey any, newKey any, value T) (int, bool) {
 	return m.setAt(presentKey, newKey, value, 0)
 }
 
 // SetAfter sets the new (newKey, value) pair after the given presentKey.
 // Return false if presentKey does not exist or if newKey already exists.
-func (m *orderedMap[T]) SetAfter(presentKey any, newKey any, value T) (int, bool) {
+func (m *OM[T]) SetAfter(presentKey any, newKey any, value T) (int, bool) {
 	return m.setAt(presentKey, newKey, value, 1)
 }
 
-// GetIterator returns an iterator for the map.
-func (m *orderedMap[T]) GetIterator() Iterator[T] {
+// Iterator returns an OMIterator for the map.
+func (m *OM[T]) Iterator() Iterator[T] {
 	values := make([]T, len(m.key))
 	for _, key := range m.key {
 		values = append(values, m.data[key])
 	}
-	return &iterator[T]{values: values}
+	return &OMIterator[T]{values: values}
 }
 
-func (m *orderedMap[T]) setAt(presentKey any, newKey any, val T, delta int) (int, bool) {
+func (m *OM[T]) setAt(presentKey any, newKey any, val T, delta int) (int, bool) {
 	if _, ok := m.data[presentKey]; !ok {
 		return 0, false
 	}
