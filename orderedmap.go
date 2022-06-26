@@ -126,7 +126,7 @@ func (m *OMap[T]) Iterator() Iterator[T] {
 	for _, key := range m.key {
 		values = append(values, m.data[key])
 	}
-	return &OMIterator[T]{values: values}
+	return NewIterator[T](values)
 }
 
 func (m *OMap[T]) setAt(presentKey any, newKey any, val T, delta int) (int, bool) {
