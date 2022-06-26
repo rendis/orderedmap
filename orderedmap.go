@@ -13,6 +13,9 @@ type IOrderedMap[T any] interface {
 	Set(key any, val T)
 	Get(key any) (T, bool)
 	Delete(key any) (T, bool)
+	Keys() []any
+	Values() []T
+	Exists(key any) bool
 	Index(key any) int
 	ReplaceKey(oldKey any, newKey any) bool
 	SetBefore(presentKey any, newKey any, val T) (int, bool)
@@ -56,6 +59,26 @@ func (m *OrderedMap[T]) Delete(key any) (T, bool) {
 		return v, true
 	}
 	return *new(T), false
+}
+
+// Keys returns the keys of the map.
+func (m *OrderedMap[T]) Keys() []any {
+	return m.key
+}
+
+// Values returns the values of the map.
+func (m *OrderedMap[T]) Values() []T {
+	vals := make([]T, len(m.key))
+	for i, k := range m.key {
+		vals[i] = m.data[k]
+	}
+	return vals
+}
+
+// Exists returns true if the key exists in the map.
+func (m *OrderedMap[T]) Exists(key any) bool {
+	_, ok := m.data[key]
+	return ok
 }
 
 // Index returns the index of the given key.
