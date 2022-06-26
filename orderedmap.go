@@ -16,7 +16,7 @@ type OrderedMap[T any] interface {
 	Keys() []any
 	Values() []T
 	Exists(key any) bool
-	Index(key any) int
+	IndexOf(key any) int
 	ReplaceKey(oldKey any, newKey any) bool
 	SetBefore(presentKey any, newKey any, val T) (int, bool)
 	SetAfter(presentKey any, newKey any, val T) (int, bool)
@@ -81,9 +81,9 @@ func (m *OMap[T]) Exists(key any) bool {
 	return ok
 }
 
-// Index returns the index of the given key.
+// IndexOf returns the index of the given key.
 // If the key does not exist, returns -1.
-func (m *OMap[T]) Index(key any) int {
+func (m *OMap[T]) IndexOf(key any) int {
 	for i, k := range m.key {
 		if k == key {
 			return i
@@ -101,7 +101,7 @@ func (m *OMap[T]) ReplaceKey(oldKey any, newKey any) bool {
 	if _, ok := m.data[newKey]; ok {
 		return false
 	}
-	i := m.Index(oldKey)
+	i := m.IndexOf(oldKey)
 	m.key[i] = newKey
 	m.data[newKey] = m.data[oldKey]
 	delete(m.data, oldKey)
