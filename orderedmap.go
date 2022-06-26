@@ -122,7 +122,7 @@ func (m *OMap[T]) SetAfter(presentKey any, newKey any, value T) (int, bool) {
 
 // Iterator returns an OMIterator for the map.
 func (m *OMap[T]) Iterator() Iterator[T] {
-	values := make([]T, len(m.key))
+	values := make([]T, 0, len(m.key))
 	for _, key := range m.key {
 		values = append(values, m.data[key])
 	}
