@@ -5,7 +5,8 @@ type Iterator[T any] interface {
 	HasNext() bool
 	Next() bool
 	GetNext() (T, bool)
-	GetCurrent() (T, bool)
+	GetCurrent() T
+	GetCurrentV() (T, int, bool)
 }
 
 // OMIterator is an Iterator implementation.
@@ -45,9 +46,19 @@ func (i *OMIterator[T]) GetNext() (T, bool) {
 }
 
 // GetCurrent returns the current element in the OMIterator.
-func (i *OMIterator[T]) GetCurrent() (T, bool) {
+// Prefer use with HasNext() or with Next() to avoid false positives.
+// Alternatively, use GetCurrentV(), which is more verbose.
+func (i *OMIterator[T]) GetCurrent() T {
 	if i.HasNext() {
-		return i.current, true
+		return i.current
 	}
-	return *new(T), false
+	return *new(T)
+}
+
+// GetCurrentV returns the current element, the index and true if there was a current element in the OMIterator.
+func (i *OMIterator[T]) GetCurrentV() (T, int, bool) {
+	if i.HasNext() {
+		return i.current, i.index, true
+	}
+	return *new(T), -1, false
 }
